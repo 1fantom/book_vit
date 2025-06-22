@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Что такое обыкновенные дроби</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    .fraction {
+      display: inline-block;
+      text-align: center;
+      vertical-align: middle;
+      margin: 0 5px;
+    }
+
+    .fraction .top {
+      display: block;
+      font-size: 1.2em;
+      font-weight: bold;
+    }
+
+    .fraction .line {
+      display: block;
+      border-top: 2px solid #444;
+      width: 100%;
+      margin: 2px 0;
+    }
+
+    .fraction .bottom {
+      display: block;
+      font-size: 1.2em;
+      font-weight: bold;
+    }
+
+    .inline-fractions strong {
+      margin-right: 15px;
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+
+  <main class="main-content">
+    <section class="hero fade-in">
+      <h1>Что такое обыкновенные дроби?</h1>
+      <p>Обыкновенные дроби — это числа, выражающие одну или несколько равных частей целого.</p>
+
+      <div class="fraction" style="margin: 20px auto;">
+        <span class="top">1</span>
+        <span class="line"></span>
+        <span class="bottom">2</span>
+      </div>
+
+      <p>Такая дробь читается как <strong>«одна вторая»</strong> и означает половину от целого.</p>
+    </section>
+
+    <section class="feature fade-in">
+      <h2>Состав дроби</h2>
+      <ul style="list-style: disc; padding-left: 1.5rem; text-align: left;">
+        <li><strong>Числитель</strong> — показывает, сколько частей взято (например, <strong>1</strong> в дроби 
+          <span class="fraction"><span class="top">1</span><span class="line"></span><span class="bottom">2</span></span>).
+        </li>
+        <li><strong>Знаменатель</strong> — показывает, на сколько частей поделено целое (например, <strong>2</strong> в дроби 
+          <span class="fraction"><span class="top">1</span><span class="line"></span><span class="bottom">2</span></span>).
+        </li>
+      </ul>
+    </section>
+
+    <section class="feature fade-in">
+      <h2>Примеры дробей</h2>
+      <div class="inline-fractions">
+        <strong>
+          <span class="fraction">
+            <span class="top">3</span>
+            <span class="line"></span>
+            <span class="bottom">4</span>
+          </span> — три четверти
+        </strong>
+
+        <strong>
+          <span class="fraction">
+            <span class="top">3</span>
+            <span class="line"></span>
+            <span class="bottom">5</span>
+          </span> — три пятых
+        </strong>
+
+        <strong>
+          <span class="fraction">
+            <span class="top">7</span>
+            <span class="line"></span>
+            <span class="bottom">8</span>
+          </span> — семь восьмых
+        </strong>
+      </div>
+    </section>
+
+    <div class="fade-in" style="margin-top: 30px;">
+      <a href="theory_properties.html" class="main-button">Свойство дробей →</a>
+    </div>
+  </main>
+
+  <footer class="site-footer fade-in">
+    &copy; 2025 Silvia | Учебный проект по математике
+  </footer>
+
+  <script>
+    // Подключение шапки
+    fetch('header.html')
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById('header-placeholder').innerHTML = data;
+      });
+
+    // Плавное появление
+    window.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.fade-in').forEach(el => {
+        el.classList.add('show');
+      });
+    });
+  </script>
+</body>
+</html>

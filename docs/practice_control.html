@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Тест по дробям</title>
+  <link rel="stylesheet" href="css/style.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+  <style>
+    body {
+      background: #1f1f2e;
+      color: var(--light, #eee);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    main.main-content {
+      flex-grow: 1;
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 20px;
+      background: #2a2a2a;
+      border-radius: 15px;
+      box-shadow: 0 0 20px rgba(157,78,221,0.6);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    h2 {
+      text-align: center;
+      font-weight: 700;
+      font-size: 2rem;
+      margin-bottom: 20px;
+      color: var(--purple7, #e0aaff);
+    }
+
+    form#quiz-form {
+      display: flex;
+      gap: 40px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* Левая колонка с примерами */
+    #quiz-examples {
+      flex: 1 1 45%;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding: 10px 20px;
+      background: #3a3a4e;
+      border-radius: 12px;
+      box-shadow: inset 0 0 10px rgba(157,78,221,0.3);
+      user-select: none;
+    }
+    #quiz-examples .example {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--purple6, #c77dff);
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Правая колонка с ответами */
+    #quiz-answers {
+      flex: 1 1 45%;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding: 10px 20px;
+      background: #3a3a4e;
+      border-radius: 12px;
+      box-shadow: inset 0 0 10px rgba(157,78,221,0.3);
+    }
+    #quiz-answers .answer-block {
+      display: flex;
+      flex-direction: column;
+    }
+    #quiz-answers label {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--light, #eee);
+    }
+    #quiz-answers input[type="text"] {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 2px solid var(--purple5, #9d4edd);
+      background: #2a2a2a;
+      color: var(--light, #eee);
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+    #quiz-answers input[type="text"]:focus {
+      outline: none;
+      border-color: var(--purple6, #c77dff);
+      box-shadow: 0 0 8px rgba(157,78,221,0.5);
+    }
+
+    button.main-button {
+      margin: 30px auto 0;
+      background: linear-gradient(45deg, var(--purple6, #c77dff), var(--purple7, #e0aaff));
+      color: var(--light, #eee);
+      border: none;
+      padding: 14px 30px;
+      border-radius: 30px;
+      font-size: 1.2rem;
+      cursor: pointer;
+      font-weight: 700;
+      box-shadow: 0 0 14px rgba(157,78,221,0.7);
+      transition: box-shadow 0.3s ease;
+      display: block;
+      width: fit-content;
+    }
+    button.main-button:hover {
+      box-shadow: 0 0 26px rgba(157,78,221,0.9);
+    }
+
+    #quiz-result {
+      max-width: 900px;
+      margin: 20px auto 0;
+      text-align: center;
+      font-size: 1.3rem;
+      color: var(--purple6, #c77dff);
+      font-weight: 700;
+      min-height: 40px;
+    }
+
+    /* Плавное появление */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .fade-in.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Адаптив */
+    @media(max-width: 720px) {
+      form#quiz-form {
+        flex-direction: column;
+      }
+      #quiz-examples, #quiz-answers {
+        flex: 1 1 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Шапка -->
+  <header id="header-placeholder"></header>
+
+  <main class="main-content">
+    <h2 class="fade-in">🧠 Тест по дробям</h2>
+
+    <form id="quiz-form" class="fade-in" autocomplete="off">
+      <div id="quiz-examples" aria-label="Примеры заданий">
+        <!-- Примеры вопросов появятся здесь -->
+      </div>
+      <div id="quiz-answers" aria-label="Поля для ответов">
+        <!-- Поля для ответов здесь -->
+      </div>
+
+      <button type="submit" class="main-button">Проверить результаты</button>
+    </form>
+
+    <div id="quiz-result" class="fade-in" role="alert" aria-live="polite"></div>
+  </main>
+
+  <footer class="site-footer fade-in" style="text-align:center; margin-top: 40px;">
+    &copy; 2025 Образовательный портал
+  </footer>
+
+  <script>
+    // Подгружаем шапку
+    fetch('header.html')
+      .then(r => r.text())
+      .then(html => {
+        document.getElementById('header-placeholder').innerHTML = html;
+      });
+
+    // Вспомогательные функции
+    function getRandomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function generateFraction() {
+      const numerator = getRandomInt(1, 9);
+      const denominator = getRandomInt(numerator + 1, 12); // знаменатель > числителя
+      return { numerator, denominator };
+    }
+
+    function fractionToLatex({ numerator, denominator }) {
+      return `\\( \\frac{${numerator}}{${denominator}} \\)`;
+    }
+
+    function generateQuestion(id) {
+      const frac1 = generateFraction();
+      const frac2 = generateFraction();
+
+      const operators = ['+', '-'];
+      const operator = operators[getRandomInt(0, operators.length - 1)];
+
+      const commonDenominator = frac1.denominator * frac2.denominator;
+      let resultNumerator;
+      if (operator === '+') {
+        resultNumerator = frac1.numerator * frac2.denominator + frac2.numerator * frac1.denominator;
+      } else {
+        resultNumerator = frac1.numerator * frac2.denominator - frac2.numerator * frac1.denominator;
+      }
+
+      function gcd(a, b) {
+        if (!b) return a;
+        return gcd(b, a % b);
+      }
+
+      const gcdVal = gcd(Math.abs(resultNumerator), commonDenominator);
+      resultNumerator /= gcdVal;
+      const resultDenominator = commonDenominator / gcdVal;
+
+      const questionText = `Вычислите: ${fractionToLatex(frac1)} ${operator} ${fractionToLatex(frac2)} = `;
+
+      return {
+        id,
+        questionText,
+        answerNumerator: resultNumerator,
+        answerDenominator: resultDenominator
+      };
+    }
+
+    // Рендер вопросов и полей
+    function renderQuiz(questions) {
+      const examplesContainer = document.getElementById('quiz-examples');
+      const answersContainer = document.getElementById('quiz-answers');
+
+      examplesContainer.innerHTML = '';
+      answersContainer.innerHTML = '';
+
+      questions.forEach(q => {
+        // Добавляем пример слева
+        const exampleDiv = document.createElement('div');
+        exampleDiv.className = 'example';
+        exampleDiv.innerHTML = q.questionText;
+        examplesContainer.appendChild(exampleDiv);
+
+        // Добавляем поле для ответа справа
+        const answerBlock = document.createElement('div');
+        answerBlock.className = 'answer-block';
+
+        answerBlock.innerHTML = `
+          <label for="answer-${q.id}">Ответ #${q.id}</label>
+          <input type="text" id="answer-${q.id}" name="answer-${q.id}" placeholder="Введите дробь или число" />
+        `;
+
+        answersContainer.appendChild(answerBlock);
+      });
+
+      if(window.MathJax) {
+        MathJax.typesetPromise();
+      }
+    }
+
+    // Проверка ответа
+    function checkAnswer(userAnswer, correctNum, correctDen) {
+      userAnswer = userAnswer.trim();
+
+      if (!userAnswer) return false;
+
+      // Если целое число
+      if (!userAnswer.includes('/')) {
+        const val = Number(userAnswer);
+        return val === correctNum / correctDen;
+      }
+
+      const parts = userAnswer.split('/');
+      if(parts.length !== 2) return false;
+
+      const num = Number(parts[0]);
+      const den = Number(parts[1]);
+
+      if (isNaN(num) || isNaN(den) || den === 0) return false;
+
+      return num * correctDen === correctNum * den;
+    }
+
+    // Запуск при загрузке страницы
+    document.addEventListener('DOMContentLoaded', () => {
+      const numQuestions = 5;
+      const questions = [];
+
+      for(let i = 1; i <= numQuestions; i++) {
+        questions.push(generateQuestion(i));
+      }
+
+      renderQuiz(questions);
+
+      const form = document.getElementById('quiz-form');
+      const resultDiv = document.getElementById('quiz-result');
+
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+
+        let correctCount = 0;
+        questions.forEach(q => {
+          const userInput = form[`answer-${q.id}`].value;
+          if(checkAnswer(userInput, q.answerNumerator, q.answerDenominator)) {
+            correctCount++;
+          }
+        });
+
+        resultDiv.textContent = `Вы правильно ответили на ${correctCount} из ${numQuestions} вопросов.`;
+      });
+
+      document.querySelectorAll('.fade-in').forEach(el => el.classList.add('show'));
+    });
+  </script>
+</body>
+</html>
