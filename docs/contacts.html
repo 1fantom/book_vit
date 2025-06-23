@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Контакты — Silvia 💜</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <style>
+    :root {
+      --purple2: #3c096c;
+      --purple4: #7b2cbf;
+      --purple6: #c77dff;
+      --light: #e0aaff;
+      --dark: #10002b;
+      --green: #80ff80;
+    }
+    body {
+      background: linear-gradient(120deg, var(--purple2), var(--purple4));
+      color: var(--light);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding-top: 70px; /* под фиксированную шапку */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    #header-placeholder {
+      width: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background: linear-gradient(120deg, var(--purple2), var(--purple4));
+      z-index: 1000;
+      margin-bottom: 30px;
+    }
+    .contact-container {
+      background: #2a2a2a;
+      max-width: 460px;
+      width: 90%;
+      border-radius: 12px;
+      padding: 30px 25px;
+      box-shadow: 0 0 14px 4px rgba(199, 125, 255, 0.4);
+      text-align: center;
+    }
+    h1 {
+      color: var(--purple6);
+      margin-bottom: 20px;
+    }
+    p {
+      margin-bottom: 25px;
+      font-size: 1.1rem;
+    }
+    .contact-info {
+      text-align: left;
+      font-size: 1rem;
+      line-height: 1.6;
+      color: var(--light);
+      margin-bottom: 30px;
+    }
+    .contact-info strong {
+      color: var(--purple6);
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+    label {
+      margin-bottom: 6px;
+      font-weight: 600;
+      color: var(--purple6);
+    }
+    input, textarea {
+      background: #3b3b3b;
+      border: none;
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 20px;
+      color: var(--light);
+      font-size: 1rem;
+      resize: vertical;
+      outline: none;
+    }
+    textarea {
+      min-height: 100px;
+    }
+    button {
+      background: linear-gradient(45deg, var(--purple6), var(--purple4));
+      border: none;
+      border-radius: 30px;
+      padding: 12px 30px;
+      color: var(--dark);
+      font-weight: 700;
+      cursor: pointer;
+      font-size: 1.1rem;
+      box-shadow: 0 0 10px #9d4edd;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: linear-gradient(45deg, var(--purple4), var(--purple6));
+    }
+    .success-message {
+      color: var(--green);
+      font-weight: 700;
+      margin-top: 15px;
+      min-height: 1.4em;
+    }
+  </style>
+</head>
+<body>
+
+<header id="header-placeholder"></header>
+
+<div class="contact-container">
+  <h1>Свяжись со мной</h1>
+  <p>Буду рада помочь и ответить на все вопросы! 💜</p>
+
+  <div class="contact-info">
+    <p><strong>Email:</strong> <a href="mailto:silvia@example.com" style="color: var(--purple6);">vitaly9513@mail.ru</a></p>
+    <p><strong>Телефон:</strong> +375 (33) 6876965</p>
+  </div>
+
+  <form id="contactForm">
+    <label for="name">Имя</label>
+    <input type="text" id="name" name="name" placeholder="Ваше имя" required />
+
+    <label for="email">Email</label>
+    <input type="email" id="email" name="email" placeholder="example@mail.com" required />
+
+    <label for="message">Сообщение</label>
+    <textarea id="message" name="message" placeholder="Напишите ваше сообщение..." required></textarea>
+
+    <button type="submit">Отправить</button>
+  </form>
+
+  <div class="success-message" id="successMessage"></div>
+</div>
+
+<script>
+  // Подгрузка шапки
+  fetch('header.html')
+    .then(response => response.text())
+    .then(html => {
+      document.getElementById('header-placeholder').innerHTML = html;
+      if (typeof initBurgerMenu === 'function') {
+        initBurgerMenu();
+      }
+    })
+    .catch(err => console.error('Ошибка загрузки шапки:', err));
+
+  const form = document.getElementById('contactForm');
+  const successMessage = document.getElementById('successMessage');
+
+  form.addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    // Простая имитация отправки (тут можно подключить реальный backend)
+    successMessage.textContent = "Спасибо, сообщение отправлено! Я скоро свяжусь с тобой.";
+    form.reset();
+  });
+</script>
+
+</body>
+</html>

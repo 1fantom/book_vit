@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Мемори Дробей — Silvia</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .memory-hero {
+      text-align: center;
+      padding: 30px 20px;
+      background: linear-gradient(120deg, var(--purple2), var(--purple4));
+      color: var(--light);
+      border-radius: 12px;
+      margin-bottom: 30px;
+    }
+    .memory-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .card {
+      position: relative;
+      width: 100%;
+      padding-top: 100%;
+      perspective: 600px;
+    }
+    .card-inner {
+      position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+      transition: transform 0.5s;
+      transform-style: preserve-3d;
+      cursor: pointer;
+    }
+    .card.flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+    .card-front, .card-back {
+      position: absolute;
+      width: 100%; height: 100%;
+      backface-visibility: hidden;
+      border-radius: 8px;
+      box-shadow: 0 0 6px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      font-weight: 600;
+    }
+    .card-back {
+      background: var(--purple3);
+      color: var(--light);
+    }
+    .card-front {
+      background: var(--light);
+      color: var(--dark);
+      transform: rotateY(180deg);
+    }
+    .stats {
+      text-align: center;
+      margin-top: 20px;
+      color: var(--light);
+      font-size: 1.1rem;
+    }
+  </style>
+</head>
+<body>
+
+<header id="header-placeholder"></header>
+
+<main class="main-content fade-in">
+  <div class="memory-hero fade-in">
+    <h1>Мемори Дробей</h1>
+    <p>Найдите все пары **одинаковых** дробей!</p>
+  </div>
+
+  <div class="memory-grid fade-in" id="memory-grid"></div>
+
+  <div class="stats fade-in" id="stats">
+    Ходов: 0 &nbsp;|&nbsp; Пары: 0 из 8
+  </div>
+</main>
+
+
+
+<script>
+  fetch('header.html').then(r=>r.text()).then(html=>{
+    document.getElementById('header-placeholder').innerHTML = html;
+    document.querySelectorAll('.fade-in').forEach(el=>el.classList.add('show'));
+  });
+
+  // 8 уникальных дробей, каждая по 2 карточки
+  const fractions = [
+    "1/2","2/3","3/4","4/5",
+    "1/3","2/5","3/5","5/6"
+  ];
+  let cards = [...fractions, ...fractions];
+  let firstCard = null, secondCard = null;
+  let lock = false, moves = 0, matches = 0;
+
+  function shuffle(a){ return a.sort(()=>Math.random()-0.5); }
+
+  function createBoard(){
+    const grid = document.getElementById('memory-grid');
+    shuffle(cards).forEach(frac=>{
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.dataset.value = frac;
+      card.innerHTML = `
+        <div class="card-inner">
+          <div class="card-back"></div>
+          <div class="card-front">${frac}</div>
+        </div>`;
+      card.addEventListener('click', onClick);
+      grid.appendChild(card);
+    });
+  }
+
+  function onClick(e){
+    const c = e.currentTarget;
+    if(lock||c===firstCard||c.classList.contains('matched')) return;
+    c.classList.add('flipped');
+    if(!firstCard){
+      firstCard = c;
+      return;
+    }
+    secondCard = c;
+    lock = true;
+    moves++; updateStats();
+    if(firstCard.dataset.value === secondCard.dataset.value){
+      firstCard.classList.add('matched');
+      secondCard.classList.add('matched');
+      matches++; resetTurn();
+      updateStats();
+      if(matches===fractions.length) setTimeout(()=>{
+        alert(`Поздравляем! Найдены все пары за ${moves} ходов.`);
+      },200);
+    } else {
+      setTimeout(()=>{
+        firstCard.classList.remove('flipped');
+        secondCard.classList.remove('flipped');
+        resetTurn();
+      },1000);
+    }
+  }
+
+  function resetTurn(){
+    [firstCard, secondCard] = [null, null];
+    lock = false;
+  }
+
+  function updateStats(){
+    document.getElementById('stats').textContent =
+      `Ходов: ${moves}   |   Пары: ${matches} из ${fractions.length}`;
+  }
+
+  document.addEventListener('DOMContentLoaded', createBoard);
+</script>
+
+</body>
+</html>

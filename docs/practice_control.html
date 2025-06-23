@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Контрольные вопросы — Дроби</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+</head>
+<body>
+
+<header id="header-placeholder"></header>
+
+<main class="main-content fade-in">
+  <div class="hero fade-in">
+    <h1>Контрольные вопросы по теме «Дроби»</h1>
+    <p>Введи свои ответы и проверь себя!</p>
+  </div>
+
+  <form id="quiz-form" class="fade-in">
+    <section id="question-container">
+      <!-- Вопросы генерируются здесь -->
+    </section>
+
+    <div style="margin-top: 20px;">
+      <button type="submit" class="main-button">Проверить ответы</button>
+      <button type="button" id="show-answers" class="main-button" style="margin-left: 15px;">Показать правильные ответы</button>
+    </div>
+  </form>
+
+  <div id="result-message" class="fade-in" style="margin-top: 20px; font-size: 1.2rem; font-weight: 600;"></div>
+
+</main>
+
+<footer class="site-footer fade-in">
+  &copy; 2025 Образовательный портал Silvia
+</footer>
+
+<script>
+  const allQuestions = [
+  { text: "Что такое обыкновенная дробь?", answer: "Дробь" },
+  { text: "Как определить числитель и знаменатель дроби?", answer: "Числитель сверху" },
+  { text: "Какие дроби называются правильными и неправильными?", answer: "Правильные меньше единицы" },
+  { text: "Как перевести неправильную дробь в смешанное число?", answer: "Выделить целую часть" },
+  { text: "Что такое основное свойство дроби?", answer: "Умножение числителя и знаменателя на одно число" },
+  { text: "Как привести дроби к общему знаменателю?", answer: "Найти общий знаменатель" },
+  { text: "Объясни правило сложения дробей с разными знаменателями.", answer: "Привести к общему знаменателю" },
+  { text: "Какие действия выполняются при умножении дробей?", answer: "Перемножить числители и знаменатели" },
+  { text: "Как делить одну дробь на другую?", answer: "Умножить на перевёрнутую дробь" },
+  { text: "Реши и сократи дробь: \\( \\frac{24}{36} \\)", answer: "2/3" },
+  { text: "Запиши в виде дроби: три четвёртых.", answer: "3/4" },
+  { text: "Как проверить, равны ли две дроби?", answer: "Привести к общему знаменателю" },
+  { text: "Реши: \\( \\frac{2}{5} + \\frac{3}{10} \\)", answer: "7/10" },
+  { text: "Приведи пример задачи на дроби из повседневной жизни.", answer: "Торт" },
+  { text: "Что такое смешанное число?", answer: "Число и дробь" },
+  { text: "Как перевести десятичную дробь в обыкновенную?", answer: "Знаменатель 10 или 100" },
+  { text: "Что такое равные дроби?", answer: "Одинаковое значение" },
+  { text: "Объясни, что значит сократить дробь.", answer: "Уменьшить числитель и знаменатель" },
+  { text: "Как складывать смешанные числа?", answer: "Сложить целые и дробные части" },
+  { text: "Как определить, какая из двух дробей больше?", answer: "Привести к общему знаменателю" },
+  { text: "Что такое несократимая дробь?", answer: "Нельзя сократить" },
+  { text: "Какие дроби называются взаимно обратными?", answer: "Перевёрнутые друг к другу" },
+  { text: "Как умножать дробь на целое число?", answer: "Числитель умножить на число" },
+  { text: "Что такое знаменатель дроби?", answer: "Показывает части целого" },
+  { text: "Запиши дробь: семь восьмых.", answer: "7/8" },
+  { text: "Как разделить дробь на целое число?", answer: "Знаменатель умножить на число" },
+  { text: "Как вычислить разность двух дробей?", answer: "Привести к общему знаменателю" },
+  { text: "Что такое единичная дробь?", answer: "Числитель 1" },
+  { text: "Приведи пример неправильной дроби.", answer: "5/3" },
+  { text: "Как перевести смешанное число в неправильную дробь?", answer: "Умножить целую часть на знаменатель и прибавить числитель" },
+  { text: "Что такое дробь, приведённая к общему знаменателю?", answer: "С одинаковыми знаменателями" },
+  { text: "Реши: \\( \\frac{5}{12} + \\frac{7}{12} \\)", answer: "1" },
+  { text: "Как найти часть от числа с помощью дроби?", answer: "Умножить число на дробь" },
+  { text: "Что показывает числитель дроби?", answer: "Сколько частей взяли" },
+  { text: "Как сравнить дроби с разными знаменателями?", answer: "Привести к общему знаменателю" },
+  { text: "Что такое основное свойство сложения дробей?", answer: "Сложение после приведения к общему знаменателю" },
+  { text: "Как выполнить вычитание дробей с разными знаменателями?", answer: "Привести к общему знаменателю" },
+  { text: "Как найти дробь от числа?", answer: "Умножить число на дробь" },
+  { text: "Что такое дробное выражение?", answer: "Выражение с дробями" },
+  { text: "Приведи пример деления дробей.", answer: "1/2 ÷ 1/4" },
+  { text: "Чем отличается смешанное число от обыкновенной дроби?", answer: "Есть целая часть" },
+  { text: "Как найти неизвестное в равенстве дробей?", answer: "Применить основное свойство дроби" },
+  { text: "Какие дроби называют правильными?", answer: "Меньше единицы" },
+  { text: "Что означает сокращение дроби?", answer: "Уменьшить числитель и знаменатель" },
+  { text: "Запиши: одна вторая.", answer: "1/2" },
+  { text: "Как умножать две дроби?", answer: "Числители перемножить, знаменатели перемножить" },
+  { text: "Что такое дробный коэффициент?", answer: "Коэффициент в виде дроби" },
+  { text: "Приведи пример применения дробей в жизни.", answer: "Рецепт" },
+  { text: "Как вычислить дробь с разными единицами измерения?", answer: "Привести к одним единицам" },
+  { text: "Как преобразовать сложное дробное выражение?", answer: "Упростить дроби" }
+];
+
+
+  function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  }
+
+  function renderQuestions() {
+    const container = document.getElementById('question-container');
+    const selected = shuffle([...allQuestions]).slice(0, 10);
+
+    selected.forEach((question, index) => {
+      const card = document.createElement('div');
+      card.className = 'question-card';
+      card.innerHTML = `
+        <div class="question-title">${index + 1}. ${question.text}</div>
+        <input type="text" class="main-input" name="answer${index}" placeholder="Введите ответ..." style="width: 100%; padding: 8px; margin-top: 10px; border-radius: 6px; border: none; outline: none;">
+        <div class="correct-answer" style="margin-top: 10px; color: var(--purple7); display: none;">
+          Правильный ответ: <strong>${question.answer}</strong>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+
+    container.dataset.selected = JSON.stringify(selected);
+
+    if (window.MathJax) {
+      MathJax.typesetPromise();
+    }
+  }
+
+  document.getElementById('quiz-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const container = document.getElementById('question-container');
+    const selected = JSON.parse(container.dataset.selected);
+    const inputs = container.querySelectorAll('input');
+    let correct = 0;
+
+    inputs.forEach((input, index) => {
+      const userAnswer = input.value.trim().toLowerCase();
+      const correctAnswer = selected[index].answer.toLowerCase();
+
+      if (userAnswer === correctAnswer) {
+        input.style.backgroundColor = '#308d46aa'; // зелёный
+      } else {
+        input.style.backgroundColor = '#8d3030aa'; // красный
+      }
+
+      if (userAnswer === correctAnswer) correct++;
+    });
+
+    document.getElementById('result-message').innerHTML = `Ты ответил(а) правильно на ${correct} из 10 вопросов.`;
+  });
+
+  document.getElementById('show-answers').addEventListener('click', () => {
+    document.querySelectorAll('.correct-answer').forEach(el => el.style.display = 'block');
+  });
+
+  fetch('header.html')
+    .then(r => r.text())
+    .then(html => {
+      document.getElementById('header-placeholder').innerHTML = html;
+    });
+
+  window.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.fade-in').forEach(el => el.classList.add('show'));
+    renderQuestions();
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Учебник</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+  <!-- Шапка (загружается из header.html) -->
+  <header id="header-placeholder"></header>
+
+  <!-- Главный контент -->
+  <main class="main-content">
+    <section class="hero">
+      <h1>Добро пожаловать в учебник по дробям</h1>
+      <p>Лучшее место для обучения и развития ваших знаний.</p>
+      <a href="#" class="main-button">
+        <i class="fas fa-graduation-cap"></i> Начать обучение
+      </a>
+    </section>
+
+    <section class="features" aria-label="Преимущества">
+      <article class="feature fade-in">
+        <i class="fas fa-chalkboard-teacher fa-2x icon-accent"></i>
+        <h2>Интерактивные курсы</h2>
+        <p>Погрузитесь в обучение с помощью интерактивных материалов и упражнений.</p>
+      </article>
+      <article class="feature fade-in">
+        <i class="fas fa-user-friends fa-2x icon-accent"></i>
+        <h2>Поддержка преподавателей</h2>
+        <p>Получайте помощь и консультации от опытных педагогов в любое время.</p>
+      </article>
+      <article class="feature fade-in">
+        <i class="fas fa-globe fa-2x icon-accent"></i>
+        <h2>Сообщество учеников</h2>
+        <p>Общайтесь и обменивайтесь знаниями с другими студентами по всему миру.</p>
+      </article>
+    </section>
+
+    <section class="about feature fade-in">
+      <h2>Наша миссия</h2>
+      <p>Мы стремимся сделать образование доступным, интересным и вдохновляющим для каждого ученика — независимо от возраста и уровня знаний.</p>
+    </section>
+  </main>
+
+  <!-- Подвал -->
+  
+
+  <!-- Скрипты -->
+  <script>
+    // Подгружаем шапку
+    fetch('header.html')
+      .then(response => response.text())
+      .then(html => {
+        document.getElementById('header-placeholder').innerHTML = html;
+
+        // Бургер-меню после загрузки шапки
+        const burger = document.getElementById('burger');
+        const nav = document.querySelector('.nav-links');
+
+        if (burger && nav) {
+          burger.addEventListener('click', () => {
+            nav.classList.toggle('nav-active');
+            burger.classList.toggle('toggle');
+          });
+        }
+      });
+
+    // Анимация появления блоков
+    document.addEventListener('DOMContentLoaded', () => {
+      const faders = document.querySelectorAll('.fade-in');
+      const options = {
+        threshold: 0.2,
+        rootMargin: "0px 0px -50px 0px"
+      };
+
+      const observer = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('show');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, options);
+
+      faders.forEach(el => observer.observe(el));
+    });
+  </script>
+</body>
+</html>

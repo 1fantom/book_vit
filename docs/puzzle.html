@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Пазлы со смешанными числами — Silvia</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .puzzle-hero {
+      text-align: center;
+      padding: 30px 20px;
+      background: linear-gradient(120deg, var(--purple2), var(--purple4));
+      color: var(--light);
+      border-radius: 12px;
+      margin-bottom: 30px;
+    }
+    .puzzle-container {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+    .puzzle-slot, .puzzle-piece {
+      width: 100%;
+      padding-top: 100%;
+      position: relative;
+      border: 2px dashed var(--purple5);
+      border-radius: 8px;
+      background: #2a2a2a;
+      box-shadow: 0 0 6px rgba(0,0,0,0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: var(--light);
+      text-align: center;
+      padding: 10px;
+    }
+    .puzzle-piece {
+      cursor: grab;
+      background-color: var(--purple3);
+    }
+    .puzzle-slot.filled {
+      border-style: solid;
+    }
+    .puzzle-slot.hovered {
+      border-color: var(--purple7);
+    }
+    .main-button {
+      display: block;
+      margin: 20px auto;
+    }
+  </style>
+</head>
+<body>
+
+<header id="header-placeholder"></header>
+
+<main class="main-content fade-in">
+  <div class="puzzle-hero fade-in">
+    <h1>Пазлы — Смешанные Числа</h1>
+    <p>Перетащи дроби в соответствующие слоты с подсказками.</p>
+  </div>
+
+  <div class="puzzle-container fade-in" id="slots"></div>
+
+  <div class="puzzle-container fade-in" id="pieces" style="margin-top:30px;"></div>
+
+  <button class="main-button fade-in" onclick="checkPuzzle()">Проверить</button>
+  <div id="puzzle-result" class="fade-in" style="text-align:center; margin-top:15px; font-weight:600;"></div>
+</main>
+
+<footer class="site-footer fade-in">
+  &copy; 2025 Образовательный портал Silvia
+</footer>
+
+<script>
+  const mixedNumbers = ["1 1/2", "2 1/3", "3 2/5", "4 3/4", "5 1/6", "2 3/4", "3 1/2", "4 2/3", "1 3/4", "5 2/5"];
+
+  function shuffle(arr) {
+    return arr.sort(() => Math.random() - 0.5);
+  }
+
+  function generatePuzzle() {
+    const slotsContainer = document.getElementById("slots");
+    const piecesContainer = document.getElementById("pieces");
+    slotsContainer.innerHTML = "";
+    piecesContainer.innerHTML = "";
+
+    const selected = shuffle(mixedNumbers).slice(0, 4);
+    const shuffled = shuffle([...selected]);
+
+    selected.forEach(answer => {
+      const slot = document.createElement("div");
+      slot.className = "puzzle-slot";
+      slot.dataset.answer = answer;
+      slot.innerHTML = `<strong>Перетащи сюда: ${answer}</strong>`;
+      slotsContainer.appendChild(slot);
+    });
+
+    shuffled.forEach(value => {
+      const piece = document.createElement("div");
+      piece.className = "puzzle-piece";
+      piece.textContent = value;
+      piece.dataset.value = value;
+      piece.draggable = true;
+      piecesContainer.appendChild(piece);
+
+      piece.addEventListener("dragstart", e => {
+        dragged = piece;
+        setTimeout(() => piece.style.visibility = "hidden", 0);
+      });
+      piece.addEventListener("dragend", e => {
+        piece.style.visibility = "visible";
+      });
+    });
+
+    document.querySelectorAll(".puzzle-slot").forEach(slot => {
+      slot.addEventListener("dragover", e => {
+        e.preventDefault();
+        slot.classList.add("hovered");
+      });
+      slot.addEventListener("dragleave", e => {
+        slot.classList.remove("hovered");
+      });
+      slot.addEventListener("drop", e => {
+        e.preventDefault();
+        slot.classList.remove("hovered");
+        if (!slot.querySelector(".puzzle-piece")) {
+          slot.appendChild(dragged);
+          slot.classList.add("filled");
+        }
+      });
+    });
+  }
+
+  let dragged = null;
+
+  function checkPuzzle() {
+    let correct = 0;
+    document.querySelectorAll(".puzzle-slot").forEach(slot => {
+      const piece = slot.querySelector(".puzzle-piece");
+      if (piece && piece.dataset.value === slot.dataset.answer) {
+        slot.style.boxShadow = "0 0 8px 2px rgba(72,183,0,0.6)";
+        correct++;
+      } else {
+        slot.style.boxShadow = "0 0 8px 2px rgba(200,50,50,0.6)";
+      }
+    });
+    const msg = correct === 4
+      ? "Отлично! Все дроби на месте 💜"
+      : `Правильных: ${correct} из 4.`;
+    document.getElementById("puzzle-result").textContent = msg;
+  }
+
+  fetch('header.html').then(r => r.text()).then(html => {
+    document.getElementById('header-placeholder').innerHTML = html;
+    document.querySelectorAll('.fade-in').forEach(el => el.classList.add('show'));
+  });
+
+  document.addEventListener("DOMContentLoaded", generatePuzzle);
+</script>
+
+</body>
+</html>

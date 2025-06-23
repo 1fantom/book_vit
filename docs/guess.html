@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Угадай дробь — Silvia 💜</title>
+  <link rel="stylesheet" href="css/style.css">
+
+<style>
+  :root {
+    --purple2: #3c096c;
+    --purple4: #7b2cbf;
+    --purple5: #9d4edd;
+    --purple6: #c77dff;
+    --purple7: #d4bfff;
+    --light: #e0aaff;
+    --dark: #10002b;
+    --green: #80ff80;
+    --red: #ff6b6b;
+  }
+  body {
+    background: linear-gradient(120deg, var(--purple2), var(--purple4));
+    color: var(--light);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+    /* Центрируем содержимое */
+    display: flex;
+    justify-content: center;
+    align-items: center; /* вертикальное центрирование */
+    min-height: 100vh;
+    margin: 0;
+    padding-top: 70px; /* отступ под фиксированную шапку */
+    user-select: none;
+    flex-direction: column;
+  }
+  #header-placeholder {
+    width: 100%;
+    margin-bottom: 30px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background: linear-gradient(120deg, var(--purple2), var(--purple4));
+    z-index: 1000;
+  }
+  .game-container {
+    max-width: 420px;
+    width: 100%;
+    background: #2a2a2a;
+    padding: 30px 25px;
+    border-radius: 12px;
+    box-shadow: 0 0 14px 4px rgba(199, 125, 255, 0.4);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  h1 {
+    color: var(--purple6);
+    margin-bottom: 15px;
+  }
+  p {
+    font-size: 1rem;
+    margin-bottom: 25px;
+    color: var(--light);
+  }
+  label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--purple6);
+  }
+  select, input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    border: none;
+    margin-bottom: 20px;
+    outline: none;
+    text-align: center;
+    background: #3b3b3b;
+    color: var(--light);
+  }
+  .submit-btn {
+    margin-top: 5px;
+    padding: 12px 30px;
+    font-size: 1.25rem;
+    border: none;
+    border-radius: 30px;
+    background: linear-gradient(45deg, var(--purple6), var(--purple7));
+    color: var(--dark);
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 0 10px #9d4edd;
+    transition: background 0.3s ease;
+  }
+  .submit-btn:hover:not(:disabled) {
+    background: linear-gradient(45deg, var(--purple5), var(--purple6));
+  }
+  .submit-btn:disabled {
+    background: #555555;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+  .message {
+    margin-top: 15px;
+    font-weight: 700;
+    min-height: 1.4em;
+    font-size: 1.2rem;
+    transition: color 0.3s ease;
+  }
+  .message.success {
+    color: var(--green);
+  }
+  .message.error {
+    color: var(--red);
+  }
+  .hint {
+    margin: 12px 0 20px;
+    font-style: italic;
+    font-size: 1.1rem;
+    min-height: 1.4em;
+    color: var(--purple5);
+  }
+  .attempts {
+    margin-top: 10px;
+    font-weight: 600;
+    color: var(--light);
+  }
+
+  /* Анимация конфетти при победе */
+  .confetti-piece {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background-color: var(--purple6);
+    opacity: 0;
+    animation: confetti-fall 2s forwards;
+  }
+  @keyframes confetti-fall {
+    0% {
+      opacity: 1;
+      transform: translateY(0) rotate(0deg);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(200px) rotate(360deg);
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- Шапка -->
+<header id="header-placeholder"></header>
+
+<div class="game-container">
+  <h1>Угадай дробь</h1>
+  <p>Я загадала дробь. Попробуй её угадать! Введи в формате <strong>числитель/знаменатель</strong>.</p>
+
+  <label for="difficulty">Выбери уровень сложности:</label>
+  <select id="difficulty">
+    <option value="easy">Легкий (до 5 в числителе и знаменателе, 8 попыток)</option>
+    <option value="medium" selected>Средний (до 8, 6 попыток)</option>
+    <option value="hard">Сложный (до 12, 4 попыток)</option>
+  </select>
+
+  <input type="text" id="guessInput" placeholder="Например 3/4" autocomplete="off" />
+  <button class="submit-btn" id="submitBtn">Проверить</button>
+  
+  <div class="message" id="message"></div>
+  <div class="hint" id="hint"></div>
+  <div class="attempts" id="attempts"></div>
+</div>
+
+<script>
+  // Подгрузка шапки
+  fetch('header.html')
+    .then(response => response.text())
+    .then(html => {
+      document.getElementById('header-placeholder').innerHTML = html;
+      // Здесь можно добавить инициализацию бургер-меню, если надо
+      if (typeof initBurgerMenu === 'function') {
+        initBurgerMenu();
+      }
+    })
+    .catch(err => console.error('Ошибка загрузки шапки:', err));
+
+  let numerator, denominator, fractionValue;
+  let attemptsLeft;
+  const guessInput = document.getElementById('guessInput');
+  const submitBtn = document.getElementById('submitBtn');
+  const messageEl = document.getElementById('message');
+  const hintEl = document.getElementById('hint');
+  const attemptsEl = document.getElementById('attempts');
+  const difficultySelect = document.getElementById('difficulty');
+
+  function gcd(a, b) {
+    return b === 0 ? a : gcd(b, a % b);
+  }
+
+  function simplifyFraction(n, d) {
+    const g = gcd(n, d);
+    return [n / g, d / g];
+  }
+
+  function generateFraction(level) {
+    let maxNum, maxDen;
+    switch(level) {
+      case 'easy': maxNum = 5; maxDen = 5; attemptsLeft = 8; break;
+      case 'medium': maxNum = 8; maxDen = 8; attemptsLeft = 6; break;
+      case 'hard': maxNum = 12; maxDen = 12; attemptsLeft = 4; break;
+      default: maxNum = 8; maxDen = 8; attemptsLeft = 6;
+    }
+    do {
+      numerator = Math.floor(Math.random() * maxNum) + 1;
+      denominator = Math.floor(Math.random() * maxDen) + 1;
+    } while (denominator === 0 || numerator > denominator); // дробь правильная (<= 1)
+    fractionValue = numerator / denominator;
+    attemptsEl.textContent = `Попыток осталось: ${attemptsLeft}`;
+    hintEl.textContent = 'Подсказка появится после первой попытки.';
+    messageEl.textContent = '';
+    guessInput.value = '';
+    guessInput.disabled = false;
+    submitBtn.disabled = false;
+    guessInput.focus();
+  }
+
+  function generateHint() {
+    const hints = [];
+    if (fractionValue > 0.75) hints.push("Дробь больше 3/4.");
+    else if (fractionValue > 0.5) hints.push("Дробь больше 1/2.");
+    else if (fractionValue > 0.25) hints.push("Дробь больше 1/4.");
+    else hints.push("Дробь меньше 1/4.");
+
+    if (numerator > Math.floor(denominator / 2)) hints.push("Числитель больше половины знаменателя.");
+    else hints.push("Числитель меньше или равен половине знаменателя.");
+
+    if (denominator % 2 === 0) hints.push("Знаменатель — четное число.");
+    else hints.push("Знаменатель — нечетное число.");
+
+    return hints[Math.floor(Math.random() * hints.length)];
+  }
+
+  function confetti() {
+    for (let i = 0; i < 40; i++) {
+      const confettiPiece = document.createElement('div');
+      confettiPiece.classList.add('confetti-piece');
+      confettiPiece.style.left = Math.random() * 100 + '%';
+      confettiPiece.style.backgroundColor = `hsl(${Math.random()*360}, 70%, 80%)`;
+      confettiPiece.style.animationDelay = (Math.random() * 2) + 's';
+      document.querySelector('.game-container').appendChild(confettiPiece);
+      setTimeout(() => confettiPiece.remove(), 2200);
+    }
+  }
+
+  function checkGuess() {
+    messageEl.textContent = '';
+    messageEl.className = 'message';
+    const guess = guessInput.value.trim();
+    if (!guess.includes('/')) {
+      messageEl.textContent = 'Введи дробь в формате числитель/знаменатель.';
+      messageEl.classList.add('error');
+      return;
+    }
+
+    const parts = guess.split('/');
+    const guessNum = parseInt(parts[0], 10);
+    const guessDen = parseInt(parts[1], 10);
+
+    if (isNaN(guessNum) || isNaN(guessDen) || guessDen === 0) {
+      messageEl.textContent = 'Некорректный ввод.';
+      messageEl.classList.add('error');
+      return;
+    }
+
+    const [simpNum, simpDen] = simplifyFraction(guessNum, guessDen);
+
+    if (simpNum === numerator && simpDen === denominator) {
+      messageEl.textContent = '💜 Молодец! Ты угадал дробь!';
+      messageEl.classList.add('success');
+      submitBtn.disabled = true;
+      guessInput.disabled = true;
+      hintEl.textContent = '';
+      attemptsEl.textContent = '';
+      confetti();
+    } else {
+      attemptsLeft--;
+      if (attemptsLeft <= 0) {
+        messageEl.textContent = `😢 Попытки закончились! Загаданная дробь: ${numerator}/${denominator}`;
+        messageEl.classList.add('error');
+        submitBtn.disabled = true;
+        guessInput.disabled = true;
+        hintEl.textContent = '';
+        attemptsEl.textContent = '';
+      } else {
+        messageEl.textContent = `Неверно. Попробуй ещё!`;
+        messageEl.classList.add('error');
+        hintEl.textContent = generateHint();
+        attemptsEl.textContent = `Попыток осталось: ${attemptsLeft}`;
+      }
+    }
+    guessInput.value = '';
+    guessInput.focus();
+  }
+
+  submitBtn.addEventListener('click', checkGuess);
+  guessInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') checkGuess();
+  });
+
+  difficultySelect.addEventListener('change', () => {
+    generateFraction(difficultySelect.value);
+  });
+
+  // Инициализация игры при загрузке
+  generateFraction(difficultySelect.value);
+</script>
+
+</body>
+</html>

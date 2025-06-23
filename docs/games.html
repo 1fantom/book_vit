@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Игры — Silvia</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+  <style>
+    .games-hero {
+      text-align: center;
+      padding: 40px 20px;
+      background: linear-gradient(120deg, var(--purple2), var(--purple4));
+      color: var(--light);
+      border-radius: 12px;
+      margin-bottom: 30px;
+    }
+    .game-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+    }
+    .game-card {
+      background: #2a2a2a;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 0 8px 2px rgba(199,125,255,0.2);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .game-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 0 12px 4px rgba(199,125,255,0.3);
+    }
+    .game-title {
+      font-size: 1.2rem;
+      color: var(--purple6);
+      margin-bottom: 10px;
+    }
+    .game-desc {
+      font-size: 1rem;
+      color: var(--light);
+      margin-bottom: 15px;
+    }
+    .game-button {
+      display: inline-block;
+      padding: 10px 20px;
+      background: linear-gradient(45deg, var(--purple6), var(--purple7));
+      color: var(--dark);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background 0.3s ease;
+    }
+    .game-button:hover {
+      background: linear-gradient(45deg, var(--purple5), var(--purple6));
+    }
+  </style>
+</head>
+<body>
+
+<header id="header-placeholder"></header>
+
+<main class="main-content fade-in">
+
+  <div class="games-hero fade-in">
+    <h1>Раздел «Игры»</h1>
+    <p>Выбери игру, чтобы весело закрепить знания по дробям!</p>
+  </div>
+
+  <section class="fade-in">
+    <div class="game-list" id="game-list">
+
+      <!-- Примеры карточек игр -->
+      <div class="game-card">
+        <div class="game-title">Мемори Дробей</div>
+        <div class="game-desc">Запомни пары равных дробей и проверь свою память.</div>
+        <a href="memory.html" class="game-button">Играть</a>
+      </div>
+
+      <div class="game-card">
+        <div class="game-title">Гонки на дробях</div>
+        <div class="game-desc">Выбирай правильную дробь, чтобы опережать соперников.</div>
+        <a href="race.html" class="game-button">Играть</a>
+      </div>
+
+      <div class="game-card">
+        <div class="game-title">Лабиринт дробей</div>
+        <div class="game-desc">Найди выход, решая примеры на сложение и вычитание дробей.</div>
+        <a href="maze.html" class="game-button">Играть</a>
+      </div>
+
+      <div class="game-card">
+        <div class="game-title">Угадай дробь</div>
+        <div class="game-desc">Попробуй угадать спрятанную дробь по подсказкам. Чем меньше попыток — тем лучше!</div>
+        <a href="guess.html" class="game-button">Играть</a>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<script>
+  // Динамическая подгрузка шапки
+  fetch('header.html')
+    .then(r => r.text())
+    .then(html => {
+      document.getElementById('header-placeholder').innerHTML = html;
+    });
+
+  // Анимация появления
+  window.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.fade-in').forEach(el => el.classList.add('show'));
+  });
+</script>
+
+</body>
+</html>

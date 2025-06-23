@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Практика по дробям — Вопросы и Формулы</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+  <style>
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    .section-title {
+      font-size: 1.8rem;
+      color: var(--purple5);
+      text-shadow: 0 0 3px var(--purple5);
+      border-bottom: 2px solid var(--purple6);
+      padding-bottom: 0.3rem;
+    }
+    .filter-select {
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: none;
+      outline: none;
+      font-size: 1rem;
+      background: var(--metallic-gray);
+      color: var(--light);
+      cursor: pointer;
+    }
+    .item-card {
+      background: #2a2a2a;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 0 8px 2px rgba(199,125,255,0.2);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .item-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 0 12px 4px rgba(199,125,255,0.3);
+    }
+    .item-text {
+      font-size: 1.1rem;
+      color: var(--light);
+    }
+    .main-input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 8px;
+      border: none;
+      border-radius: 6px;
+      outline: none;
+      font-size: 1rem;
+    }
+    .feedback {
+      margin-top: 6px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+<header id="header-placeholder"></header>
+
+<main class="main-content fade-in">
+  <div class="hero fade-in">
+    <h1>Практика по дробям</h1>
+    <p>Выбери уровень и попробуй себя!</p>
+  </div>
+
+  <!-- Выбор уровня -->
+  <section class="fade-in" style="margin-top:30px;">
+    <div class="section-header">
+      <h2 class="section-title">Выберите уровень сложности</h2>
+      <select id="level-select" class="filter-select">
+        <option value="easy">Лёгкий</option>
+        <option value="medium">Средний</option>
+        <option value="hard">Сложный</option>
+      </select>
+    </div>
+  </section>
+
+  <!-- Вопросы -->
+  <section class="fade-in" style="margin-top:20px;">
+    <h2 class="section-title">Теоретические вопросы</h2>
+    <div id="questions-container"></div>
+  </section>
+
+  <!-- Формулы -->
+  <section class="fade-in" style="margin-top:40px;">
+    <h2 class="section-title">Практические формулы</h2>
+    <form id="tasks-form">
+      <div id="tasks-container"></div>
+      <div style="text-align:center; margin-top:20px;">
+        <button type="button" class="main-button" onclick="checkAll()">Проверить ответы</button>
+        <button type="button" class="main-button" onclick="showAllAnswers()" style="margin-left:15px;">
+          Показать правильные ответы
+        </button>
+      </div>
+      <div id="tasks-result" style="margin-top:15px; text-align:center; font-size:1.1rem;"></div>
+    </form>
+  </section>
+</main>
+
+
+
+<script>
+  const questionsData = {
+    easy: [
+      "Что называется дробью?",
+      "Как определить числитель дроби?",
+      "Как определить знаменатель дроби?",
+      "Что такое собственная дробь?",
+      "Что такое неправильная дробь?",
+      "Как сократить дробь?",
+      "Что значит привести дробь к общему знаменателю?",
+      "Чему равно значение дроби 1/2?",
+      "Как сравнить дроби с одинаковым знаменателем?",
+      "Как сравнить дроби с одинаковым числителем?",
+      "Что такое смешанная дробь?",
+      "Как представить смешанное число дробью?",
+      "Что такое десятичная дробь?",
+      "Как перевести обыкновенную дробь в десятичную?",
+      "Что означает «раскрыть скобки» в дробном выражении?",
+      "Как умножить дробь на целое число?",
+      "Как разделить дробь на целое число?",
+      "Что показывает числитель дроби?",
+      "Что показывает знаменатель дроби?",
+      "Как выполнить сложение дробей с одинаковым знаменателем?",
+      "Как выполнить вычитание дробей с одинаковым знаменателем?",
+      "Что такое единичная дробь?",
+      "Как найти значение дроби от числа?",
+      "Что такое обратная дробь?",
+      "Как найти обратную дробь?",
+      "Что такое эквивалентные дроби?",
+      "Как получить эквивалентную дробь?",
+      "Почему 1/2 = 2/4?",
+      "Что означает привести дробь к несократимому виду?",
+      "Как проверить, можно ли сократить дробь?",
+      "Что такое основное свойство дроби?",
+      "Как умножить две дроби?",
+      "Как разделить две дроби?",
+      "Что такое комплексная дробь?",
+      "Как найти НОД числителя и знаменателя?",
+      "Как найти НОК знаменателей?",
+      "Что такое правильная дробь?",
+      "Что такое сумма дробей?",
+      "Что такое разность дробей?",
+      "Как действие умножения влияет на значение дроби?",
+      "Как действие деления влияет на значение дроби?",
+      "Как привести дробь к виду с единичным числителем?",
+      "Что такое дробная часть числа?",
+      "Как выделить целую часть из неправильной дроби?",
+      "Что такое дробный коэффициент?",
+      "Как перевести дробь в процент?",
+      "Как перевести процент в дробь?"
+    ],
+    medium: [
+      "Как сложить дроби с разными знаменателями?",
+      "Как вычесть дроби с разными знаменателями?",
+      "Что такое НОД и как он используется для дробей?",
+      "Что такое НОК и как он используется для дробей?",
+      "Как привести несколько дробей к общему знаменателю?",
+      "Как умножать дроби с разными знаменателями?",
+      "Как делить дроби с разными знаменателями?",
+      "Как выполнить сокращение дроби перед умножением?",
+      "Как найти произведение неправильных дробей?",
+      "Как найти частное неправильных дробей?",
+      "Что такое смешанное число и как с ним работать?",
+      "Как перевести смешанное число в неправильную дробь?",
+      "Как выполнить сложение смешанных чисел?",
+      "Как выполнить вычитание смешанных чисел?",
+      "Как сравнить смешанные числа?",
+      "Что такое отрицательная дробь?",
+      "Как работать с отрицательными дробями?",
+      "Как сложить отрицательную и положительную дробь?",
+      "Как вычесть отрицательную дробь из положительной?",
+      "Как умножить отрицательную дробь на дробь?",
+      "Как вычислить дробный квадрат числа?",
+      "Что такое квадратный корень из дроби?",
+      "Как найти обратный дробный корень?",
+      "Как преобразовать дробное выражение в простую дробь?",
+      "Как упростить выражение (a/b) + (c/d)?",
+      "Как упростить выражение (a/b) - (c/d)?",
+      "Как выполнить умножение многочлена и дроби?",
+      "Что такое дробно-рациональное уравнение?",
+      "Как решать простые дробно-рациональные уравнения?",
+      "Что такое алгебраическая дробь?",
+      "Как выполнять операции с алгебраическими дробями?",
+      "Как раскрыть скобки в алгебраической дроби?",
+      "Как сократить алгебраическую дробь?",
+      "Как найти область определения дробного выражения?",
+      "Что такое дробная часть логарифма?",
+      "Как найти значение дробного логарифма?",
+      "Что такое композиция дробных функций?",
+      "Как работать с композицией дробных функций?",
+      "Как найти предел дробного выражения?",
+      "Как вычислить производную дроби?",
+      "Что такое интеграл от дроби?",
+      "Как интегрировать дробные выражения?",
+      "Как применять дроби в задачах на процент?",
+      "Как применять дроби в задачах на скорость?",
+      "Как применять дроби в задачах на работу?",
+      "Как применять дроби в задаче на смесь?",
+      "Что такое задача на дроби в геометрии?"
+    ],
+    hard: [
+      "Что такое несократимая дробь и как её определить?",
+      "Как доказать, что дробь несократима?",
+      "Что такое взаимно простые числа в дроби?",
+      "Как найти наибольший общий делитель для дробей?",
+      "Как найти наименьшее общее кратное для дробей?",
+      "Что такое цепная дробь?",
+      "Как разложить число в цепную дробь?",
+      "Как вычислить приближение числа через цепные дроби?",
+      "Что такое гиперболическая дробь?",
+      "Как работают гиперболические дроби?",
+      "Что такое тригонометрическая дробь?",
+      "Как упрощать тригонометрические дробные выражения?",
+      "Как приводить дробные сомножители к общему знаменателю?",
+      "Что такое дробно-рациональная непрерывная функция?",
+      "Как интегрировать дробно-рациональную функцию?",
+      "Как решать дифференциальные уравнения с дробями?",
+      "Что такое дробная производная?",
+      "Как применять дробные производные?",
+      "Что такое дробный интеграл?",
+      "Как работать с дробными интегралами?",
+      "Что такое оператор дробного порядка?",
+      "Как решать уравнения с оператором дробного порядка?",
+      "Что такое фрактальная дробь?",
+      "Как вычислять фрактальные дроби?",
+      "Что такое p-адическая дробь?",
+      "Как работают p-адические дроби?",
+      "Что такое q-дробь в теории чисел?",
+      "Как использовать q-дробь?",
+      "Что такое функциональная дробь?",
+      "Как упростить функциональные дроби?",
+      "Как работать с дробными полиномами?",
+      "Что такое дробно-линейная функция?",
+      "Как приводить дробно-линейные функции к стандартному виду?",
+      "Что такое дробно-показательная функция?",
+      "Как работать с дробно-показательными функциями?",
+      "Что такое дробная степень матрицы?",
+      "Как вычислять дробную степень матрицы?",
+      "Что такое дробная комбинаторика?",
+      "Как решать задачи дробной комбинаторики?",
+      "Что такое дробная вероятность?",
+      "Как вычислять дробные вероятности?",
+      "Что такое дробная энтропия?",
+      "Как работать с дробной энтропией?",
+      "Что такое дробные меры?",
+      "Как применять дробные меры?"
+    ]
+  };
+
+  const formulasData = {
+    easy: [
+      { expr:"\\(\\frac{1}{2}+\\frac{1}{3}=\\frac{5}{6}\\)", answer:"5/6" },
+      { expr:"\\(\\frac{3}{4}-\\frac{1}{4}=\\frac{1}{2}\\)", answer:"1/2" },
+      { expr:"\\(2\\times\\frac{1}{5}=\\frac{2}{5}\\)", answer:"2/5" },
+      { expr:"\\(\\frac{4}{7}\\div2=\\frac{2}{7}\\)", answer:"2/7" },
+      { expr:"\\(\\frac{5}{8}+\\frac{3}{8}=1\\)", answer:"1" }
+    ],
+    medium: [
+      { expr:"\\(\\frac{2}{3}+\\frac{3}{5}=\\frac{19}{15}\\)", answer:"19/15" },
+      { expr:"\\(\\frac{7}{9}-\\frac{2}{3}=\\frac{1}{9}\\)", answer:"1/9" },
+      { expr:"\\(\\frac{5}{6}\\times\\frac{3}{4}=\\frac{5}{8}\\)", answer:"5/8" },
+      { expr:"\\(\\frac{9}{10}\\div\\frac{3}{5}=\\frac{3}{2}\\)", answer:"3/2" },
+      { expr:"\\(1\\tfrac{2}{5}+2\\tfrac{1}{3}=3\\tfrac{11}{15}\\)", answer:"3 11/15" }
+    ],
+    hard: [
+      { expr:"\\(\\frac{3}{4}+\\frac{5}{6}-\\frac{1}{2}=\\frac{7}{12}\\)", answer:"7/12" },
+      { expr:"\\(\\frac{5}{8}\\times\\frac{16}{25}=\\frac{2}{5}\\)", answer:"2/5" },
+      { expr:"\\(\\frac{7}{3}\\div\\frac{14}{9}=\\frac{3}{2}\\)", answer:"3/2" },
+      { expr:"\\(\\frac{2\\tfrac{1}{2}}{\\frac{3}{4}}=\\frac{5}{3}\\)", answer:"5/3" },
+      { expr:"\\(\\frac{(x+1)/2}{(x-1)/3}=\\frac{3(x+1)}{2(x-1)}\\)", answer:"3(x+1)/(2(x-1))" }
+    ]
+  };
+
+  function shuffle(arr){ return arr.sort(()=>Math.random()-0.5); }
+
+  function renderQuestions(level){
+  const cont = document.getElementById("questions-container");
+  cont.innerHTML = "";
+  shuffle(questionsData[level]).slice(0,5).forEach(q=>{
+    // если элемент — строка, используем её напрямую; если объект — берём q.text
+    const text = typeof q === "string" ? q : q.text;
+    const d = document.createElement("div");
+    d.className = "item-card";
+    d.innerHTML = `<div class="item-text">${text}</div>`;
+    cont.appendChild(d);
+  });
+ }
+
+
+  function renderTasks(level){
+    const cont = document.getElementById("tasks-container");
+    cont.innerHTML = "";
+    formulasData[level].forEach((f,i)=>{
+      const d=document.createElement("div");
+      d.className="item-card";
+      d.innerHTML=`
+        <div class="item-text">${f.expr}</div>
+        <input id="ans${i}" class="main-input" placeholder="Ваш ответ...">
+        <div class="feedback" id="fb${i}"></div>
+        <div class="correct-answer" id="ca${i}" style="display:none; margin-top:4px; color:var(--purple7);">
+          Правильный ответ: <strong>${f.answer}</strong>
+        </div>`;
+      cont.appendChild(d);
+    });
+    if(window.MathJax) MathJax.typesetPromise();
+  }
+
+  function checkAll(){
+    let correct=0;
+    const lvl = document.getElementById("level-select").value;
+    formulasData[lvl].forEach((f,i)=>{
+      const inp=document.getElementById("ans"+i), fb=document.getElementById("fb"+i);
+      if(inp.value.trim().toLowerCase()===f.answer.toLowerCase()){
+        inp.style.backgroundColor="#308d46aa"; fb.textContent="Верно!"; fb.style.color="#46d169"; correct++;
+      } else {
+        inp.style.backgroundColor="#8d3030aa"; fb.textContent="Неверно"; fb.style.color="#d14646";
+      }
+    });
+    document.getElementById("tasks-result").textContent=`Правильно ${correct} из 5.`;
+  }
+
+  function showAllAnswers(){
+    for(let i=0;i<5;i++) document.getElementById("ca"+i).style.display="block";
+  }
+
+  document.addEventListener("DOMContentLoaded",()=>{
+    fetch('header.html').then(r=>r.text()).then(html=>{
+      document.getElementById('header-placeholder').innerHTML=html;
+      document.querySelectorAll('.fade-in').forEach(el=>el.classList.add('show'));
+    });
+    const sel=document.getElementById("level-select");
+    sel.addEventListener("change",()=>{
+      renderQuestions(sel.value); renderTasks(sel.value);
+      document.getElementById("tasks-result").textContent="";
+    });
+    renderQuestions(sel.value); renderTasks(sel.value);
+  });
+</script>
+</body>
+</html>

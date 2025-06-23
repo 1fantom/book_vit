@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Лабиринт с дверями — Silvia 💜</title>
+  <link rel="stylesheet" href="css/style.css">
+
+  <style>
+    :root {
+      --wall-color: #3c096c;
+      --path-color: #d0bfff;
+      --player-color: #ff80ff;
+      --exit-color: #80ff80;
+      --door-color: #ff4444;
+      --cell-size: 25px;
+      --border-color: #7b2cbf;
+    }
+    body {
+      background: linear-gradient(135deg, #240046, #5a189a);
+      color: #e0aaff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+      margin: 0;
+      min-height: 100vh;
+      user-select: none;
+    }
+    #header-container {
+      width: 100%;
+      background: #3c096c;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      z-index: 100;
+    }
+    #content-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      width: 100%;
+    }
+    #maze {
+      display: grid;
+      grid-template-columns: repeat(var(--cols), var(--cell-size));
+      grid-template-rows: repeat(var(--rows), var(--cell-size));
+      gap: 1px;
+      background: var(--border-color);
+      border-radius: 12px;
+      box-shadow: 0 0 15px 3px rgba(157,78,221,0.8);
+      user-select: none;
+      margin: 20px 0;
+    }
+    .cell {
+      width: var(--cell-size);
+      height: var(--cell-size);
+      background-color: var(--wall-color);
+      transition: background-color 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 16px;
+      color: white;
+      cursor: default;
+      user-select: none;
+    }
+    .cell.path { background-color: var(--path-color); }
+    .cell.door {
+      background-color: var(--door-color);
+      box-shadow: 0 0 6px 2px #ff2222;
+      cursor: pointer;
+    }
+    .cell.player {
+      background-color: var(--player-color);
+      box-shadow: 0 0 8px 2px #ff4fff;
+    }
+    .cell.exit {
+      background-color: var(--exit-color);
+      box-shadow: 0 0 8px 3px #55ff55;
+    }
+    #reset-button {
+      padding: 10px 25px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 30px;
+      background: linear-gradient(45deg, #9d4edd, #c77dff);
+      color: #10002b;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 0 8px #9d4edd;
+      transition: background 0.3s ease;
+      margin-bottom: 20px;
+    }
+    #reset-button:hover {
+      background: linear-gradient(45deg, #7b2cbf, #9d4edd);
+      box-shadow: 0 0 12px #c77dff;
+    }
+    #modal {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 1000;
+    }
+    #modal.show {
+      visibility: visible;
+      opacity: 1;
+    }
+    #modal-content {
+      background: #3c096c;
+      padding: 25px 35px;
+      border-radius: 12px;
+      color: #fff;
+      text-align: center;
+      max-width: 320px;
+      user-select: text;
+      box-shadow: 0 0 20px #9d4edd;
+      white-space: pre-wrap;
+      font-size: 1.3rem;
+      font-weight: 700;
+      line-height: 1.4;
+    }
+    #modal-answer {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 1.3rem;
+      border-radius: 8px;
+      border: none;
+      margin-top: 15px;
+      outline: none;
+      text-align: center;
+      font-weight: 700;
+    }
+    #modal-submit {
+      margin-top: 20px;
+      padding: 10px 25px;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 30px;
+      background: linear-gradient(45deg, #9d4edd, #c77dff);
+      color: #10002b;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 0 8px #9d4edd;
+      transition: background 0.3s ease;
+    }
+    #modal-submit:hover {
+      background: linear-gradient(45deg, #7b2cbf, #9d4edd);
+      box-shadow: 0 0 12px #c77dff;
+    }
+    #modal-error {
+      color: #ff6b6b;
+      margin-top: 10px;
+      font-weight: 700;
+      min-height: 1.4em;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+<header id="header-container"></header>
+
+<div id="content-container">
+  <button id="reset-button">Сгенерировать заново</button>
+  <div id="maze"></div>
+</div>
+
+<div id="modal">
+  <div id="modal-content">
+    <div id="modal-question"></div>
+    <input id="modal-answer" type="text" placeholder="Ответ в виде дроби, например 3/4" autocomplete="off" />
+    <div id="modal-error"></div>
+    <button id="modal-submit">Проверить</button>
+  </div>
+</div>
+
+<script>
+  async function loadHeader() {
+    try {
+      const res = await fetch('header.html');
+      if (!res.ok) throw new Error('Ошибка загрузки шапки');
+      const html = await res.text();
+      document.getElementById('header-container').innerHTML = html;
+      if (typeof initBurgerMenu === 'function') initBurgerMenu();
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  const rows = 21;
+  const cols = 21;
+  document.documentElement.style.setProperty('--rows', rows);
+  document.documentElement.style.setProperty('--cols', cols);
+
+  let maze = [];
+  let playerPos = {r: 1, c: 1};
+  let exitPos = null;
+  const mazeContainer = document.getElementById('maze');
+  const modal = document.getElementById('modal');
+  const modalQuestion = document.getElementById('modal-question');
+  const modalAnswer = document.getElementById('modal-answer');
+  const modalError = document.getElementById('modal-error');
+  const modalSubmit = document.getElementById('modal-submit');
+  const doors = new Map();
+
+  function initMaze() {
+    maze = [];
+    doors.clear();
+    for (let r = 0; r < rows; r++) {
+      maze[r] = [];
+      for (let c = 0; c < cols; c++) {
+        maze[r][c] = '#';
+      }
+    }
+  }
+  function shuffle(array) {
+    let currentIndex = array.length, randomIndex;
+    while (currentIndex !== 0) {
+      randomIndex = Math.floor(Math.random() * currentIndex);
+      currentIndex--;
+      [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+    }
+    return array;
+  }
+  function generateMaze() {
+    initMaze();
+    function carvePassagesFrom(r, c) {
+      maze[r][c] = ' ';
+      const directions = shuffle([[0, 2], [0, -2], [2, 0], [-2, 0]]);
+      for (const [dr, dc] of directions) {
+        const nr = r + dr;
+        const nc = c + dc;
+        if (nr > 0 && nr < rows - 1 && nc > 0 && nc < cols - 1 && maze[nr][nc] === '#') {
+          maze[r + dr / 2][c + dc / 2] = ' ';
+          carvePassagesFrom(nr, nc);
+        }
+      }
+    }
+    carvePassagesFrom(1, 1);
+    addDoors();
+  }
+  function addDoors() {
+    const doorChance = 0.12;
+    for (let r = 1; r < rows - 1; r++) {
+      for (let c = 1; c < cols - 1; c++) {
+        if (maze[r][c] === ' ' && !(r === playerPos.r && c === playerPos.c)) {
+          if (Math.random() < doorChance) {
+            maze[r][c] = 'D';
+            doors.set(`${r},${c}`, generateFractionProblem());
+          }
+        }
+      }
+    }
+  }
+  function generateFractionProblem() {
+    function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
+    function simplify(num, den) {
+      const g = gcd(num, den);
+      return [num / g, den / g];
+    }
+    function randFrac() {
+      let num = Math.floor(Math.random() * 8) + 1;
+      let den = Math.floor(Math.random() * 8) + 2;
+      return simplify(num, den);
+    }
+    function fracToStr([n, d]) {
+      return d === 1 ? '' + n : n + '/' + d;
+    }
+    const ops = ['+', '-', '*', '/'];
+    const op = ops[Math.floor(Math.random() * ops.length)];
+    let [aNum, aDen] = randFrac();
+    let [bNum, bDen] = randFrac();
+    let question = `${fracToStr([aNum, aDen])} ${op} ${fracToStr([bNum, bDen])}`;
+    let answerNum;
+    switch (op) {
+      case '+': answerNum = simplify(aNum * bDen + bNum * aDen, aDen * bDen); break;
+      case '-': answerNum = simplify(aNum * bDen - bNum * aDen, aDen * bDen); break;
+      case '*': answerNum = simplify(aNum * bNum, aDen * bDen); break;
+      case '/': answerNum = simplify(aNum * bDen, aDen * bNum); break;
+    }
+    if (answerNum[0] < 0) answerNum = [-answerNum[0], answerNum[1]];
+    return { question, answerNum };
+  }
+  function renderMaze() {
+    mazeContainer.innerHTML = '';
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const div = document.createElement('div');
+        div.classList.add('cell');
+        if (maze[r][c] === ' ') div.classList.add('path');
+        else if (maze[r][c] === 'D') {
+          div.classList.add('door');
+          div.title = 'Дверь - нажмите, чтобы решить пример';
+          div.addEventListener('click', () => openDoor(r, c));
+        }
+        if (r === playerPos.r && c === playerPos.c) div.classList.add('player');
+        if (exitPos && r === exitPos[0] && c === exitPos[1]) {
+          div.classList.add('exit');
+          div.classList.add('path');
+        }
+        mazeContainer.appendChild(div);
+      }
+    }
+  }
+  function openDoor(r, c) {
+    const doorKey = `${r},${c}`;
+    if (!doors.has(doorKey)) return;
+    const problem = doors.get(doorKey);
+    modalQuestion.textContent = `Реши пример:\n${problem.question}`;
+    modalAnswer.value = '';
+    modalError.textContent = '';
+    modal.classList.add('show');
+    modalAnswer.focus();
+    modalSubmit.onclick = () => {
+      const answerStr = modalAnswer.value.trim();
+      if (checkAnswer(answerStr, problem.answerNum)) {
+        maze[r][c] = ' ';
+        doors.delete(doorKey);
+        modal.classList.remove('show');
+        renderMaze();
+      } else {
+        modalError.textContent = 'Неверно, попробуй ещё.';
+      }
+    };
+  }
+  function checkAnswer(input, answerNum) {
+    input = input.replace(/\s/g, '');
+    if (input.includes('/')) {
+      const parts = input.split('/');
+      if (parts.length !== 2) return false;
+      const num = parseInt(parts[0], 10);
+      const den = parseInt(parts[1], 10);
+      if (isNaN(num) || isNaN(den) || den === 0) return false;
+      const g = (a, b) => b === 0 ? a : g(b, a % b);
+      const gcdVal = g(num, den);
+      return num / gcdVal === answerNum[0] && den / gcdVal === answerNum[1];
+    } else {
+      const val = parseInt(input, 10);
+      return !isNaN(val) && val === answerNum[0] && answerNum[1] === 1;
+    }
+  }
+  function resetMaze() {
+    generateMaze();
+    playerPos = { r: 1, c: 1 };
+    exitPos = [rows - 2, cols - 2];
+    renderMaze();
+  }
+  window.addEventListener('keydown', (e) => {
+    let nr = playerPos.r, nc = playerPos.c;
+    switch (e.key) {
+      case 'ArrowUp': nr--; break;
+      case 'ArrowDown': nr++; break;
+      case 'ArrowLeft': nc--; break;
+      case 'ArrowRight': nc++; break;
+      default: return;
+    }
+    if (nr < 0 || nr >= rows || nc < 0 || nc >= cols) return;
+    if (maze[nr][nc] === ' ') {
+      playerPos = { r: nr, c: nc };
+      renderMaze();
+      if (playerPos.r === exitPos[0] && playerPos.c === exitPos[1]) {
+        alert('Поздравляю! Ты вышел из лабиринта! 💜');
+        resetMaze();
+      }
+    } else if (maze[nr][nc] === 'D') {
+      openDoor(nr, nc);
+    }
+  });
+
+  document.getElementById('reset-button').addEventListener('click', resetMaze);
+
+  loadHeader();
+  resetMaze();
+</script>
+
+</body>
+</html>
